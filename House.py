@@ -32,14 +32,42 @@ class House:
     def get_edges(self):
         return self.edges
 
+    def get_state(self):
+        return self.house_state
+
     '''___Setters___'''
     def add_edge(self, edge):
         self.edges.append(edge)
         return
 
-    def set_state(self, state):
-        self.state = state
+    def set_state(self, house_state):
+        assert house_state in [0, 1, 2, 3, 4], \
+            f"Expected combustion state in [0, 1, 2, 3, 4] but got {house_state}."
+        self.house_state = house_state
         return
+
+    '''___Fire_State_Functions___'''
+    def primary_ignition(self):
+        self.house_state = 1
+        return
+
+    def secondary_ignition(self):
+        self.house_state = 2
+        return
+
+    def burns_down(self):
+        if self.house_state == 1:
+            self.house_state = 3
+        else:
+            self.house_state = 4
+        return
+
+    def reset(self):
+        self.house_state = 0
+        return
+
+    def is_on_fire(self):
+        return self.house_state in [1, 2]
 
 class Edge:
     '''This class respresent the edges betweeen houses. An edge holds the distance and edge angle between two houses.
