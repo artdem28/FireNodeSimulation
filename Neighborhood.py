@@ -24,7 +24,7 @@ class Neighborhood:
         houses = self.houses
         for house1 in houses:
             for house2 in houses:
-                if house1 != house2:
+                if house1 is not house2:
                     house1.add_edge(Edge(house1, house2))
         return
 
