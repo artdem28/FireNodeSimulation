@@ -15,6 +15,8 @@ class House:
         self.mitigation_level = mitigation_level
         self.edges = list()
         self.house_state = 0
+        self.just_on_fire = False
+        self.spreading_fire = False
 
     '''___Getters___'''
     def get_x(self):
@@ -69,6 +71,19 @@ class House:
     def is_on_fire(self):
         return self.house_state in [1, 2]
 
+    def is_spreading_fire(self):
+        spread_fire = False
+        if not self.just_on_fire:
+            if self.house_state in [1,2]:
+                spread_fire = True
+            else:
+                spread_fire = False
+                self.burns_down()
+        return spread_fire
+
+    def update_house(self):
+        self.just_on_fire = False
+
 class Edge:
     '''This class respresent the edges betweeen houses. An edge holds the distance and edge angle between two houses.
     Establishes the probability of secondary fire spread between two houses.'''
@@ -80,5 +95,8 @@ class Edge:
         self.vegetation_bonus = 0
         self.mitigation_bonus = 0
 
+    '''___Getters___'''
+    def get_probability(self):
+        return self.probability
 
 
