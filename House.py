@@ -16,7 +16,6 @@ class House:
         self.edges = list()
         self.house_state = 0
         self.just_on_fire = False
-        self.spreading_fire = False
 
     '''___Getters___'''
     def get_x(self):
@@ -88,6 +87,8 @@ class Edge:
     '''This class respresent the edges betweeen houses. An edge holds the distance and edge angle between two houses.
     Establishes the probability of secondary fire spread between two houses.'''
     def __init__(self, house1, house2):
+        self.house1 = house1
+        self.house2 = house2
         self.distance = np.sqrt((house2.x-house1.x)^2+(house2.y-house1.y)^2)
         self.angle = np.arctan((house2.y-house1.y)/(house2.x-house1.x))
         #just did a curve fit on the probabilities of fire spread based on house seperation

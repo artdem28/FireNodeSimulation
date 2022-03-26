@@ -1,4 +1,5 @@
 from House import House, Edge
+import numpy as np
 
 
 class Neighborhood:
@@ -33,4 +34,20 @@ class Neighborhood:
     # Starts a primary fire at house 1.
     def first_house_ignition(self):
         self.houses[0].set_state(1)
+        return
+
+    #Simulates Fire Spread
+    def simulate_fire_spread(self, time_steps = 7):
+        for _ in range(time_steps):
+            for house in self.houses:
+                if house.is_spreading_fire():
+                    for edge in house.edges:
+                        if np.random.random() < edge.probability:
+                            house.update_house()
+                            edge.house2.secondary_ignition()
+        return
+
+    def simulate_fire(self):
+        self.first_house_ignition()
+        self.simulate_fire_spread()
         return

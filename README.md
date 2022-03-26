@@ -1,2 +1,2 @@
 # FireNodeSimulation
-Wildfire mitigation simulation based on node-edge structure.
+Wildfire mitigation simulation based on a node-edge structure.
