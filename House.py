@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class House:
     '''
     The node class represents a house and its connections to other houses. The node itself holds the state of the
@@ -7,7 +8,8 @@ class House:
     houses as well as its state. A house state can be 0: not on fire, 1: on fire from primary, 2: on fire from
     secondary, 3: burned down from primary, 4: burned down from secondary.
     '''
-    def __init__(self, house_num, coordinate, property_value = 0, mitigation_level = 0):
+
+    def __init__(self, house_num, coordinate, property_value=0, mitigation_level=0):
         self.number = house_num
         self.x = coordinate[0]
         self.y = coordinate[1]
@@ -18,6 +20,7 @@ class House:
         self.just_on_fire = False
 
     '''___Getters___'''
+
     def get_x(self):
         return self.x
 
@@ -37,6 +40,7 @@ class House:
         return self.house_state
 
     '''___Setters___'''
+
     def add_edge(self, edge):
         self.edges.append(edge)
         return
@@ -48,6 +52,7 @@ class House:
         return
 
     '''___Fire_State_Functions___'''
+
     def primary_ignition(self):
         self.house_state = 1
         return
@@ -71,33 +76,33 @@ class House:
         return self.house_state in [1, 2]
 
     def is_spreading_fire(self):
-        spread_fire = False
+        spreading_fire = False
         if not self.just_on_fire:
-            if self.house_state in [1,2]:
-                spread_fire = True
+            if self.house_state in [1, 2]:
+                spreading_fire = True
             else:
                 spread_fire = False
                 self.burns_down()
-        return spread_fire
+        return spreading_fire
 
     def update_house(self):
         self.just_on_fire = False
 
+
 class Edge:
     '''This class respresent the edges betweeen houses. An edge holds the distance and edge angle between two houses.
     Establishes the probability of secondary fire spread between two houses.'''
+
     def __init__(self, house1, house2):
         self.house1 = house1
         self.house2 = house2
-        self.distance = np.sqrt((house2.x-house1.x)^2+(house2.y-house1.y)^2)
-        self.angle = np.arctan((house2.y-house1.y)/(house2.x-house1.x))
-        #just did a curve fit on the probabilities of fire spread based on house seperation
-        self.probability = 0.07965812 + (0.9024374 - 0.07965812)/(1 + (self.distance/7.043069)^3.402191)
+        self.distance = np.sqrt(((house2.x - house1.x) ** 2) + ((house2.y - house1.y) ** 2))
+        # just did a curve fit on the probabilities of fire spread based on house seperation
+        self.probability = 1 / (1.5 * self.distance)
         self.vegetation_bonus = 0
         self.mitigation_bonus = 0
 
     '''___Getters___'''
+
     def get_probability(self):
         return self.probability
-
-
