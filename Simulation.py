@@ -1,4 +1,6 @@
 from Neighborhood import Neighborhood
+import numpy as np
+
 
 class Simulation:
     """
@@ -10,16 +12,20 @@ class Simulation:
         for desired_stat in desired_statistics:
             self.statistics[desired_stat] = list()
         self.coordinates = coordinates
-        return
 
-    def run_simulation(self, num_of_iterations):
+    def run_simulation(self, num_of_iterations, mitigation_level, wind_direction, wind_speed_multiplier):
+        neighborhood = Neighborhood(self.coordinates, mitigation_level, wind_direction, wind_speed_multiplier)
         for iteration in range(num_of_iterations):
-            current_neighborhood = Neighborhood(self.coordinates)
-            current_neighborhood.simulate_fire()
-            desired_data = self.statistics.keys()
-            desired_vals = current_neighborhood.data_handler(desired_data)
-            for key in self.statistics:
+            neighborhood.simulate_fire()
+            desired_vals = neighborhood.data_handler(self.statistics.keys())
+            for key in self.statistics.keys():
                 self.statistics[key].append(desired_vals[key])
+            neighborhood.reset_neighborhood()
+        for key in self.statistics.keys():
+            if key == "Standard Deviation of # of Affected Houses":
+                self.statistics[key] = np.std(self.statistics[key])
+            else:
+                self.statistics[key] = np.mean(self.statistics[key])
         return
 
     def get_statistics(self):

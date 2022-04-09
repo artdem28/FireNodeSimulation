@@ -9,15 +9,15 @@ class House:
     secondary, 3: burned down from primary, 4: burned down from secondary.
     '''
 
-    def __init__(self, house_num, coordinate, property_value=0, mitigation_level=0):
+    def __init__(self, house_num, coordinate, mitigation_level):
         self.number = house_num
         self.x = coordinate[0]
         self.y = coordinate[1]
-        self.property_value = property_value
         self.mitigation_level = mitigation_level
         self.edges = list()
         self.house_state = 0
-        self.just_on_fire = False
+        self.caught_primary = False
+        self.caught_secondary = False
 
     '''___Getters___'''
 
@@ -26,9 +26,6 @@ class House:
 
     def get_y(self):
         return self.y
-
-    def get_property_value(self):
-        return self.property_value
 
     def get_mitigation_level(self):
         return self.mitigation_level
@@ -54,17 +51,17 @@ class House:
     '''___Fire_State_Functions___'''
 
     def primary_ignition(self):
-        self.house_state = 1
+        self.caught_primary = True
         return
 
     def secondary_ignition(self):
-        self.house_state = 2
+        self.caught_secondary = True
         return
 
     def burns_down(self):
         if self.house_state == 1:
             self.house_state = 3
-        else:
+        elif self.house_state == 2:
             self.house_state = 4
         return
 
@@ -75,34 +72,30 @@ class House:
     def is_on_fire(self):
         return self.house_state in [1, 2]
 
-    def is_spreading_fire(self):
-        spreading_fire = False
-        if not self.just_on_fire:
-            if self.house_state in [1, 2]:
-                spreading_fire = True
-            else:
-                spread_fire = False
-                self.burns_down()
-        return spreading_fire
+    def never_on_fire(self):
+        return self.house_state == 0
 
-    def update_house(self):
-        self.just_on_fire = False
 
 
 class Edge:
     '''This class respresent the edges betweeen houses. An edge holds the distance and edge angle between two houses.
     Establishes the probability of secondary fire spread between two houses.'''
 
-    def __init__(self, house1, house2):
+    def __init__(self, house1, house2, wind_direction, wind_speed_multiplier):
         self.house1 = house1
         self.house2 = house2
+        self.mitigation_level = (house1.mitigation_level + house2.mitigation_level) / 2
+        self.angle = np.arctan2((house2.y - house1.y), (house2.x - house1.x))
         self.distance = np.sqrt(((house2.x - house1.x) ** 2) + ((house2.y - house1.y) ** 2))
-        # just did a curve fit on the probabilities of fire spread based on house seperation
-        self.probability = 1 / (1.5 * self.distance)
-        self.vegetation_bonus = 0
-        self.mitigation_bonus = 0
+
+        self.wind_angle = np.radians(wind_direction)
+        self.wind_multiplier = 0 if (self.wind_angle - self.angle) <= 0 else \
+            np.cos(self.wind_angle - self.angle) * wind_speed_multiplier
+        self.distance_probability = .9 if self.distance == 1 else 0
+        self.final_probability = (self.distance_probability + self.mitigation_level * (-self.distance_probability)) \
+                                 + (self.wind_multiplier * self.distance_probability)
 
     '''___Getters___'''
 
     def get_probability(self):
-        return self.probability
+        return self.final_probability
