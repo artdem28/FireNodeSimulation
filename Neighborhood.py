@@ -1,4 +1,5 @@
-from Node import House, Edge
+from Node import House
+from Edge import Edge
 import numpy as np
 
 
@@ -33,6 +34,15 @@ class Neighborhood:
                 if house1 is not house2:
                     house1.add_edge(Edge(house1, house2, self.wind_direction, self.wind_speed_multiplier))
         return
+
+    '''Getters'''
+    def get_dimensions(self):
+        max_x = 0
+        max_y = 0
+        for house in self.houses:
+            max_x = max(max_x, house.x)
+            max_y = max(max_y, house.y)
+        return max_x + 1, max_y + 1
 
     '''_______The following functions perform primary fire ignition and fire spread simulation_________'''
 
@@ -104,6 +114,8 @@ class Neighborhood:
             returned_dict["Total # of Houses Affected"] = self.get_num_of_houses_set_alight()
         if "Standard Deviation of # of Affected Houses" in desired_data:
             returned_dict["Standard Deviation of # of Affected Houses"] = self.get_num_of_houses_set_alight()
+        if "Heatmap" in desired_data:
+            returned_dict["Heatmap"] = self.get_heatmap()
         return returned_dict
 
     def get_num_of_houses_set_alight_by_primary(self):
@@ -122,3 +134,16 @@ class Neighborhood:
 
     def get_num_of_houses_set_alight(self):
         return self.get_num_of_houses_set_alight_by_primary() + self.get_num_of_houses_set_alight_by_secondary()
+
+    def get_heatmap(self):
+        dim = self.get_dimensions()
+        heatmap_array = list()
+        for _ in range(dim[1]):
+            row = list()
+            for _ in range(dim[0]):
+                row.append(0)
+            heatmap_array.append(row)
+        for house in self.houses:
+            if house.house_state in [1,2,3,4]:
+                heatmap_array[house.y][house.x] = 1
+        return heatmap_array

@@ -1,8 +1,9 @@
 import time
 import numpy as np
+import matplotlib.pyplot as plt
 from Simulation import Simulation
 
-FIRES_TO_SIMULATE = 1000
+FIRES_TO_SIMULATE = 10000
 HOUSE_COORDINATES = [(0, 0), (0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6), (0, 7), (0, 8), (0, 9),
                      (1, 0), (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9),
                      (2, 0), (2, 1), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (2, 7), (2, 8), (2, 9),
@@ -19,7 +20,7 @@ WIND_DIRECTION = 0
 WIND_SPEED_MULTIPLIER = 0
 CSV_file = "simulation_results.csv"
 DESIRED_STATS = ["# of Houses Affected by Primary", "# of Houses Affected by Secondary", "Total # of Houses Affected",
-                 "Standard Deviation of # of Affected Houses"]
+                 "Standard Deviation of # of Affected Houses", "Heatmap"]
 
 
 def store_stats(csv_file, stats_dict):
@@ -28,9 +29,27 @@ def store_stats(csv_file, stats_dict):
         file.write(f",{stat}")
     file.write("\n")
     for stat in stats_dict.keys():
-        file.write(f",{stats_dict.get(stat)}")
+        if stat == "Heatmap":
+            produce_heatmap(stats_dict.get(stat))
+        else:
+            file.write(f",{stats_dict.get(stat)}")
     file.close()
     return
+
+
+def produce_heatmap(heat_arr):
+    heat_stat = np.round(np.array(heat_arr)/FIRES_TO_SIMULATE, 2)
+    plt.imshow(heat_stat, cmap='OrRd', origin='lower')
+    plt.yticks(np.arange(10))
+    plt.xticks(np.arange(10))
+    for i in range(len(heat_stat)):
+        for j in range(len(heat_stat[0])):
+            plt.text(j, i, heat_stat[i, j],
+                           ha="center", va="center", color="k")
+    plt.title("Wind North")
+    plt.colorbar(label = "Probability of Fire")
+    plt.tight_layout()
+    plt.show()
 
 
 if __name__ == '__main__':

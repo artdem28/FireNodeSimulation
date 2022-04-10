@@ -19,11 +19,19 @@ class Simulation:
             neighborhood.simulate_fire()
             desired_vals = neighborhood.data_handler(self.statistics.keys())
             for key in self.statistics.keys():
-                self.statistics[key].append(desired_vals[key])
+                if key == "Heatmap":
+                    if len(self.statistics[key]) == 0:
+                        self.statistics[key] = desired_vals[key]
+                    else:
+                        self.statistics[key] = np.add(self.statistics[key], desired_vals[key])
+                else:
+                    self.statistics[key].append(desired_vals[key])
             neighborhood.reset_neighborhood()
         for key in self.statistics.keys():
             if key == "Standard Deviation of # of Affected Houses":
                 self.statistics[key] = np.std(self.statistics[key])
+            elif key == "Heatmap":
+                pass
             else:
                 self.statistics[key] = np.mean(self.statistics[key])
         return
