@@ -15,9 +15,8 @@ class Edge:
         self.wind_angle = np.radians(wind_direction)
         self.wind_multiplier = 0 if (self.wind_angle - self.angle) <= 0 else \
             np.cos(self.wind_angle - self.angle) * wind_speed_multiplier
-        self.distance_probability = .6 if self.distance == 1 else 0
-        self.final_probability = (self.distance_probability + self.mitigation_level * (-self.distance_probability)) \
-                                 + (self.wind_multiplier * self.distance_probability)
+        self.distance_probability = .1 if self.distance == 1 else 0
+        self.final_probability = (1 - house1.mitigation_level) * self.distance_probability
 
     '''___Getters___'''
 

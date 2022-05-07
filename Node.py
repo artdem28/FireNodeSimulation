@@ -6,11 +6,11 @@ class House:
     secondary, 3: burned down from primary, 4: burned down from secondary.
     '''
 
-    def __init__(self, house_num, coordinate, mitigation_level):
+    def __init__(self, house_num, coordinate):
         self.number = house_num
         self.x = coordinate[0]
         self.y = coordinate[1]
-        self.mitigation_level = mitigation_level
+        self.mitigation_level = 0
         self.edges = list()
         self.house_state = 0
         self.caught_primary = False
@@ -33,6 +33,12 @@ class House:
     def get_state(self):
         return self.house_state
 
+    def is_mitigated(self):
+        if self.mitigation_level == 0:
+            return False
+        else:
+            return True
+
     '''___Setters___'''
 
     def add_edge(self, edge):
@@ -43,6 +49,10 @@ class House:
         assert house_state in [0, 1, 2, 3, 4], \
             f"Expected combustion state in [0, 1, 2, 3, 4] but got {house_state}."
         self.house_state = house_state
+        return
+
+    def mitigate(self, mitigation_level):
+        self.mitigation_level = mitigation_level
         return
 
     '''___Fire_State_Functions___'''

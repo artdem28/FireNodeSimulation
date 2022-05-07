@@ -15,12 +15,13 @@ HOUSE_COORDINATES = [(0, 0), (0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6), (0,
                      (8, 0), (8, 1), (8, 2), (8, 3), (8, 4), (8, 5), (8, 6), (8, 7), (8, 8), (8, 9),
                      (9, 0), (9, 1), (9, 2), (9, 3), (9, 4), (9, 5), (9, 6), (9, 7), (9, 8), (9, 9)
                      ]
-MITIGATION_LEVEL = 0
+MITIGATION_LEVEL = .25
 WIND_DIRECTION = 0
 WIND_SPEED_MULTIPLIER = 0
+HEATMAP_TITLE = '20ft House Separation'
 CSV_file = "simulation_results.csv"
-DESIRED_STATS = ["# of Houses Affected by Primary", "# of Houses Affected by Secondary", "Total # of Houses Affected",
-                 "Standard Deviation of # of Affected Houses", "Heatmap"]
+DESIRED_STATS = ["Number of Houses Mitigated", "# of Houses Affected by Primary", "# of Houses Affected by Secondary",
+                 "Total # of Houses Affected", "Standard Deviation of # of Affected Houses"]
 
 
 def store_stats(csv_file, stats_dict):
@@ -39,15 +40,16 @@ def store_stats(csv_file, stats_dict):
 
 def produce_heatmap(heat_arr):
     heat_stat = np.round(np.array(heat_arr)/FIRES_TO_SIMULATE, 2)
-    plt.imshow(heat_stat, cmap='OrRd', origin='lower')
+    plt.imshow(heat_stat, cmap='hot_r', origin='lower')
     plt.yticks(np.arange(10))
     plt.xticks(np.arange(10))
     for i in range(len(heat_stat)):
         for j in range(len(heat_stat[0])):
             plt.text(j, i, heat_stat[i, j],
                            ha="center", va="center", color="k")
-    plt.title("Wind North")
+    plt.title(HEATMAP_TITLE)
     plt.colorbar(label = "Probability of Fire")
+    plt.clim(0, 1)
     plt.tight_layout()
     plt.show()
 

@@ -14,16 +14,17 @@ class Neighborhood:
         self.wind_speed_multiplier = wind_speed_multiplier
         assert type(coordinates) is list, \
             "Must input a list of coordinate tuples."
-        self.houses = self.assign_houses(coordinates, mitigation_level)
+        self.houses = self.assign_houses(coordinates)
         self.connect_houses()
+        self.mitigate_houses_random(mitigation_level)
         self.just_on_fire = False
 
     # Appends Node objects from a list of coordinates
-    def assign_houses(self, coords, mitigation_level):
+    def assign_houses(self, coords):
         houses = list()
         i = 1
         for c in coords:
-            houses.append(House(i, c, mitigation_level))
+            houses.append(House(i, c))
         return houses
 
     # Connects each node object to each other. Grows list of edges in each House object.
@@ -34,6 +35,17 @@ class Neighborhood:
                 if house1 is not house2:
                     house1.add_edge(Edge(house1, house2, self.wind_direction, self.wind_speed_multiplier))
         return
+
+    def mitigate_houses_random(self, mitigation_level):
+        num_to_mitigate = round(len(self.houses) * mitigation_level)
+        while num_to_mitigate > 0:
+            house = np.random.choice(self.houses)
+            if not house.is_mitigated():
+                house.mitigate(mitigation_level)
+                num_to_mitigate -= 1
+        return
+
+
 
     '''Getters'''
     def get_dimensions(self):
@@ -114,6 +126,8 @@ class Neighborhood:
             returned_dict["Total # of Houses Affected"] = self.get_num_of_houses_set_alight()
         if "Standard Deviation of # of Affected Houses" in desired_data:
             returned_dict["Standard Deviation of # of Affected Houses"] = self.get_num_of_houses_set_alight()
+        if "Number of Houses Mitigated" in desired_data:
+            returned_dict["Number of Houses Mitigated"] = self.get_num_of_houses_mitigated()
         if "Heatmap" in desired_data:
             returned_dict["Heatmap"] = self.get_heatmap()
         return returned_dict
@@ -134,6 +148,13 @@ class Neighborhood:
 
     def get_num_of_houses_set_alight(self):
         return self.get_num_of_houses_set_alight_by_primary() + self.get_num_of_houses_set_alight_by_secondary()
+
+    def get_num_of_houses_mitigated(self):
+        num_mitigated = 0
+        for house in self.houses:
+            if house.is_mitigated():
+                num_mitigated += 1
+        return num_mitigated
 
     def get_heatmap(self):
         dim = self.get_dimensions()
